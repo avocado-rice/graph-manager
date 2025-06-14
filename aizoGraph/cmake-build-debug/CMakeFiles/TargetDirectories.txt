@@ -1,0 +1,3 @@
+C:/Users/KatarzynaNowomiejska/CLionProjects/aizoGraph/cmake-build-debug/CMakeFiles/aizoGraph.dir
+C:/Users/KatarzynaNowomiejska/CLionProjects/aizoGraph/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/KatarzynaNowomiejska/CLionProjects/aizoGraph/cmake-build-debug/CMakeFiles/rebuild_cache.dir

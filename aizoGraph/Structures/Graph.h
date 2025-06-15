@@ -14,6 +14,7 @@ public:
     }
 
     Graph(int v, int e) {
+        currentEdgeIndex = 0;
         edges = e;
         vertexes = v;
         incidenceMatrix = new int*[vertexes];
@@ -24,11 +25,12 @@ public:
         successorList = new LinkedList[vertexes];
     }
 
-    void addEdge(int startVertex, int endVertex, int edgeIndex, int weight) {
-        incidenceMatrix[startVertex][edgeIndex] = weight;
-        incidenceMatrix[endVertex][edgeIndex] = -weight;
+    void addEdge(int startVertex, int endVertex, int weight) {
+        incidenceMatrix[startVertex][currentEdgeIndex] = weight;
+        incidenceMatrix[endVertex][currentEdgeIndex] = -weight;
 
         successorList[startVertex].append(endVertex, weight);
+        currentEdgeIndex++;
     }
 
     [[nodiscard]] int getEdges() const {
@@ -44,7 +46,11 @@ public:
     }
 
 private:
-    int edges, vertexes;
+    bool edgeExists(int start, int end) {
+        return successorList[start].contains(end);
+    }
+
+    int edges, vertexes, currentEdgeIndex;
     int** incidenceMatrix = nullptr;
     LinkedList* successorList = nullptr;
 };

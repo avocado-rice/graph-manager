@@ -7,6 +7,7 @@ struct Edge {
     Edge(int v, int w) {
     vertex = v;
     weight = w;
+
     }
 };
 
@@ -32,15 +33,25 @@ public:
             delete tmp;
         }
     }
+
+    bool contains(int end) {
+        Node* current = head;
+
+        while (current != nullptr) {
+            if (current -> data.vertex == end) {
+                return true;
+            }
+            current = current -> next;
+        }
+        return false;
+    }
+
 private:
     struct Node {
         Edge data;
         Node* next;
 
-        Node(Edge e) {
-            data = e;
-            next = nullptr;
-        }
+        Node(Edge e) : data(e), next(nullptr) {}
     };
 
     Node* head = nullptr;

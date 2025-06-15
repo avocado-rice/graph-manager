@@ -1,12 +1,10 @@
 #pragma once
 
-#include <limits>
 #include <random>
 #include <string>
 
-#include "SortCreator.h"
+#include "Structures/Graph.h"
 #include "FileHandler.h"
-#include "GetRandom.h"
 #include "Timer/Timer.h"
 
 class Manager {
@@ -38,86 +36,87 @@ public:
         count = c;
         outputFile = oF;
 
-        fillArrayRandom();
+        generateGraph();
     }
 
-    void sortArray() {
-        auto sorter = creator.createSorter(algorithm);
-        if (!sorter) {
-            throw std::invalid_argument("Invalid algorithm type. ");
+    void generateGraph(){
+        int edges = density * (size * (size - 1)) / 2;
+        dataGraph = Graph(size, edges);
+
+        bool* visited = new bool[size]{false};
+        dfs(size - 1, visited, size, dataGraph);
+
+        int residue = edges - size - 1;
+        for (int i = 0; i < residue; i++) {
+            int a = randomNumber(residue);
+            int b = randomNumber(residue);
+
+            while (a = b) {
+                b = randomNumber(residue);
+            }
+
+            if (dataGraph.getSuccessorList().)
         }
-
-        Timer zegareczek;
-        sorter->sort(initialData, size);
-        zegareczek.stop();
-
-        fileHandler.writeFileResults(algorithm, dataType, size, outputFile, zegareczek.result());
-        delete sorter;
     }
 
-    private:
-    void loadFromFile() {
-        fileHandler.readFile(inputFile);
-        initialData = fileHandler.getData();
-        size = fileHandler.getSize();
-    }
+private:
+    void dfs(int current, bool* visited, int n, Graph& graph) {
+        visited[current] = true;
+        int c = 0;
 
-    void printArray(const T* arr, int size) {
-        if (arr == nullptr || size <= 0) {
-            std::cout << "Invalid array or size." << std::endl;
-            return;
-        }
-
+        int* neighbors = new int[size];
         for (int i = 0; i < size; i++) {
-            std::cout << arr[i] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    void fillArrayRandom() {
-        initialData = new T[size];
-
-        if constexpr (std::is_integral_v<T>) {
-            for (int i = 0; i < size; i++) {
-                initialData[i] = GetRandom::getInt(
-                    std::numeric_limits<T>::lowest(),
-                    std::numeric_limits<T>::max()
-                );
-            }
-        } else {
-            constexpr T limit = static_cast<T>(1e6);
-            for (int i = 0; i < size; i++) {
-                initialData[i] = GetRandom::getReal(-limit, limit);
+            if (!visited[i]) {
+                neighbors[c++] = i;
             }
         }
+
+        shuffle(neighbors, size);
+
+        for (int i = 0; i < count; ++i) {
+            int neighbor = neighbors[i];
+            if (!visited[neighbor]) {
+                graph.addEdge(current, neighbor, randomNumber(INT_MAX));
+                 dfs(neighbor, visited, n, graph);
+            }
+        }
+
+        delete[] neighbors;
     }
 
-    [[nodiscard]] int getAlgorithm() const {
-        return algorithm;
+    void swap(int& a, int& b) {         //zamianka dwoch pozycji w tablicy
+        int temp = a;
+        a = b;
+        b = temp;
     }
 
-    [[nodiscard]] int getSize() const {
-        return size;
+    int randomNumber(int upperRange) {
+        std::mt19937 rand(std::random_device{}());
+        std::uniform_int_distribution<int> dist(0, upperRange);
+        return dist(rand);
     }
 
-    [[nodiscard]] std::string getInputFile() const {
-        return inputFile;
+    void shuffle(int* array, int size) {
+
+        for (int i = size - 1; i > 0; i--) {
+            int j = randomNumber(i);
+            swap(array[i], array[j]);
+        }
     }
 
-    [[nodiscard]] std::string getOutputFile() const {
-        return outputFile;
+    void loadFromFile() {
+
     }
 
     int problem;
     int algorithm;
-    int density;
+    double density;
     int count;
     int size = 0;
 
     std::string inputFile;
     std::string outputFile;
 
-    T* initialData = nullptr;
-    SortCreator<T> creator;
-    FileHandler<T> fileHandler;
+    Graph dataGraph;
+    FileHandler fileHandler;
 };

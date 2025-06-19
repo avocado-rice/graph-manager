@@ -1,4 +1,4 @@
-#include "Timer.h"
+#include "C:\Users\KatarzynaNowomiejska\Desktop\aizo_dwa\aizoGraph\Timer\Timer.h"
 #include <chrono>
 
 Timer::Timer() {

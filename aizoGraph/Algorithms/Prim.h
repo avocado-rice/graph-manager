@@ -48,7 +48,7 @@ private:
     int* parent;
 
     int extractMin(int* key, bool* visited, int vertexNumber) {
-        int min = 2147483647;
+        int min = INT_MAX;
         int minIndex = -1;
 
         for (int i = 0; i < vertexNumber; i++) {

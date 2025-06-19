@@ -1,20 +1,30 @@
 #pragma once
 
-struct Edge {
-    int vertex;
-    int weight;
 
-    Edge(int v, int w) {
-    vertex = v;
-    weight = w;
-
-    }
-};
 
 class LinkedList {
 public:
+    struct Edge {
+        int vertex;
+        int weight;
+
+        Edge(int v, int w) {
+            vertex = v;
+            weight = w;
+        }
+    };
+
+    struct Node {
+        Edge data;
+        Node* next;
+
+        Node(Edge e) : data(e), next(nullptr) {}
+    };
+
     void append(int successorVertex, int weight) {
+        std::cout << "Creating Node with vertex = " << successorVertex << ", weight = " << weight << std::endl;
         Node* node = new Node(Edge(successorVertex, weight));
+        std::cout << "enieodeolse";
         if (head == nullptr) {
             head = node;
         } else {
@@ -46,14 +56,16 @@ public:
         return false;
     }
 
+    void printList() {
+       Node* current = head;
+        while (current != nullptr) {
+            std::cout << "(" << current -> data.vertex << ", " << current -> data.weight << ") ";
+            current = current -> next;
+        }
+        std::cout << std::endl;
+    }
+
 private:
-    struct Node {
-        Edge data;
-        Node* next;
-
-        Node(Edge e) : data(e), next(nullptr) {}
-    };
-
     Node* head = nullptr;
 };
 

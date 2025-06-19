@@ -3,18 +3,24 @@
 
 class Graph {
 public:
+    // destruktor
+
     ~Graph() {
         for (int i = 0; i < vertexes; ++i) {
             delete[] incidenceMatrix[i];
         }
 
         delete[] incidenceMatrix;
-
         delete[] successorList;
     }
 
+    // konstruktory
+
+    Graph(const Graph&) = delete;
+    Graph& operator=(const Graph&) = delete;
+
+
     Graph(int v, int e) {
-        currentEdgeIndex = 0;
         edges = e;
         vertexes = v;
         incidenceMatrix = new int*[vertexes];
@@ -25,32 +31,61 @@ public:
         successorList = new LinkedList[vertexes];
     }
 
+    // dodanie krawedzi do grafu (macierz incydencji + lista nastepnikow)
+
     void addEdge(int startVertex, int endVertex, int weight) {
+        if (startVertex < 0 || startVertex >= vertexes) {
+            std::cerr << "Error: startVertex out of range\n";
+            return;
+        }
+        if (endVertex < 0 || endVertex >= vertexes) {
+            std::cerr << "Error: endVertex out of range\n";
+            return;
+        }
+        if (currentEdgeIndex < 0 || currentEdgeIndex >= edges) {
+            std::cerr << "Error: currentEdgeIndex out of range\n";
+            return;
+        }
+
         incidenceMatrix[startVertex][currentEdgeIndex] = weight;
         incidenceMatrix[endVertex][currentEdgeIndex] = -weight;
-
+        std::cout << '1';
         successorList[startVertex].append(endVertex, weight);
+        std::cout << '2';
         currentEdgeIndex++;
     }
 
-    [[nodiscard]] int getEdges() const {
+    // gettery
+
+    int getEdges() const {
         return edges;
     }
 
-    [[nodiscard]] int getVertexes() const {
+    int getVertexes() const {
         return vertexes;
     }
 
-    [[nodiscard]] LinkedList * getSuccessorList() const {
+    LinkedList * getSuccessorList() const {
         return successorList;
     }
 
-private:
+    // sprawdzanie czy krawedz miedzy dwoma wiercholkami istnieje
+
     bool edgeExists(int start, int end) {
         return successorList[start].contains(end);
     }
 
-    int edges, vertexes, currentEdgeIndex;
+    void printIncidence() {
+        for (int i = 0; i < vertexes; ++i) {
+            std::cout << "VERTEX " <<  i << ": " << std::endl;
+            successorList[i].printList();
+        }
+    }
+
+private:
+    // zmienne
+    int edges, vertexes;
+    int currentEdgeIndex = 0;
     int** incidenceMatrix = nullptr;
     LinkedList* successorList = nullptr;
 };

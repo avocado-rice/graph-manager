@@ -29,7 +29,7 @@ int main(int argc, const char** argv) {
             }
         } else if (mode == "test") {
             int size = std::stoi(argv[4]);
-            int density = std::stoi(argv[5]);
+            double density = std::stod(argv[5]);
             int count = std::stoi(argv[6]);
             Manager manager(problem, algorithm, size, density, count, argv[7]);
             //manager.

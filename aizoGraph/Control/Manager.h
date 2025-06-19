@@ -25,7 +25,7 @@ public:
     }
 
     // tryb benchmarkowy z generowaniem
-    Manager(int p, int a, int s, int d, int c, const std::string& oF)
+    Manager(int p, int a, int s, double d, int c, const std::string& oF)
         : problem(p), algorithm(a), size(s), density(d), count(c), outputFile(oF), dataGraph(nullptr)
     {
         generateGraph();

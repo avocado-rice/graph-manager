@@ -13,6 +13,7 @@ public:
     Manager(int p, int a, const std::string& iF, const std::string& oF)
         : problem(p), algorithm(a), inputFile(iF), outputFile(oF), dataGraph(nullptr)
     {
+        isDirected(problem);
         loadFromFile();
     }
 
@@ -20,6 +21,7 @@ public:
     Manager(int p, int a, const std::string& iF)
         : problem(p), algorithm(a), inputFile(iF), dataGraph(nullptr)
     {
+        isDirected(problem);
         loadFromFile();
         dataGraph->printIncidence();
     }
@@ -28,6 +30,7 @@ public:
     Manager(int p, int a, int s, double d, int c, const std::string& oF)
         : problem(p), algorithm(a), size(s), density(d), count(c), outputFile(oF), dataGraph(nullptr)
     {
+        isDirected(problem);
         generateGraph();
         dataGraph->printIncidence();
     }
@@ -45,7 +48,13 @@ public:
 
 private:
     void generateGraph() {
-        int edges = static_cast<int>(density * (size * (size - 1)));
+        int edges;
+        if (!directed) {
+            edges = static_cast<int>(density * (size * (size - 1)) / 2);
+        } else {
+            edges = static_cast<int>(density * (size * (size - 1)));
+        }
+
         dataGraph = new Graph(size, edges);
 
         bool* visited = new bool[size]{false};
@@ -57,23 +66,30 @@ private:
         while (added < residue) {
             int a = randomNumber(size - 1);
             int b = randomNumber(size - 1);
-            while (a == b) b = randomNumber(size - 1); // nie chcemy pętli
+            while (a == b) b = randomNumber(size - 1);
 
-            if (!dataGraph->edgeExists(a, b)) {
-                dataGraph->addEdge(a, b, randomNumber(100000));
-                added++;
+            if (directed) {
+                if (!dataGraph->edgeExists(a, b)) {
+                    dataGraph->addEdge(a, b, randomNumber(100000));
+                    added++;
+                }
+            } else {
+                if (!dataGraph->edgeExists(a, b) && !dataGraph->edgeExists(b, a)) {
+                    dataGraph->addEdgeNotDirected(a, b, randomNumber(100000));
+                    added++;
+                }
             }
         }
-
 
         delete[] visited;
     }
 
     void dfs(int current, bool* visited, Graph& graph) {
         visited[current] = true;
-        int c = 0;
 
         int* neighbors = new int[size];
+        int c = 0;
+
         for (int i = 0; i < size; i++) {
             if (!visited[i]) {
                 neighbors[c++] = i;
@@ -82,10 +98,14 @@ private:
 
         shuffle(neighbors, c);
 
-        for (int i = 0; i < c; ++i) {
+        for (int i = 0; i < c; i++) {
             int neighbor = neighbors[i];
             if (!visited[neighbor]) {
-                graph.addEdge(current, neighbor, randomNumber(INT_MAX));
+                if (directed) {
+                    graph.addEdge(current, neighbor, randomNumber(100000));
+                } else {
+                    graph.addEdgeNotDirected(neighbor, current, randomNumber(100000));
+                }
                 dfs(neighbor, visited, graph);
             }
         }
@@ -97,6 +117,14 @@ private:
         int temp = a;
         a = b;
         b = temp;
+    }
+
+    void isDirected(int decision) {
+        if (decision == 0) {
+            directed = false;
+        } else if (decision == 1) {
+            directed = true;
+        }
     }
 
     int randomNumber(int upperRange) {
@@ -113,7 +141,7 @@ private:
 
     void loadFromFile() {
         fileHandler.readFile(inputFile);
-        dataGraph = fileHandler.getGraph();  // wskazujemy bez kopiowania
+        dataGraph = fileHandler.getGraph();  // wskazuj bez kopiowania
         size = fileHandler.getSize();
     }
 
@@ -122,6 +150,7 @@ private:
     double density = 0;
     int count = 0;
     int size = 0;
+    bool directed;
 
     std::string inputFile;
     std::string outputFile;

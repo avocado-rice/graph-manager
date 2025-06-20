@@ -34,24 +34,17 @@ public:
     // dodanie krawedzi do grafu (macierz incydencji + lista nastepnikow)
 
     void addEdge(int startVertex, int endVertex, int weight) {
-        if (startVertex < 0 || startVertex >= vertexes) {
-            std::cerr << "Error: startVertex out of range\n";
-            return;
-        }
-        if (endVertex < 0 || endVertex >= vertexes) {
-            std::cerr << "Error: endVertex out of range\n";
-            return;
-        }
-        if (currentEdgeIndex < 0 || currentEdgeIndex >= edges) {
-            std::cerr << "Error: currentEdgeIndex out of range\n";
-            return;
-        }
-
         incidenceMatrix[startVertex][currentEdgeIndex] = weight;
         incidenceMatrix[endVertex][currentEdgeIndex] = -weight;
-        std::cout << '1';
         successorList[startVertex].append(endVertex, weight);
-        std::cout << '2';
+        currentEdgeIndex++;
+    }
+
+    void addEdgeNotDirected(int startVertex, int endVertex, int weight) {
+        incidenceMatrix[startVertex][currentEdgeIndex] = weight;
+        incidenceMatrix[endVertex][currentEdgeIndex] = weight;
+        successorList[startVertex].append(endVertex, weight);
+        successorList[endVertex].append(startVertex, weight);
         currentEdgeIndex++;
     }
 

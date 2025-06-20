@@ -12,4 +12,6 @@ add_executable(aizoGraph main.cpp
         Algorithms/ShortestPath.h
         Algorithms/Prim.h
         Algorithms/Kruskal.h
-        Control/Manager.h)
+        Control/Manager.h
+        Control/Worker.h
+        Control/WorkerFactory.h)

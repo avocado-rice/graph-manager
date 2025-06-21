@@ -9,7 +9,7 @@ add_executable(aizoGraph main.cpp
         Control/FileHandler.h
         Timer/Timer.h
         Timer/Timer.cpp
-        Algorithms/ShortestPath.h
+        Algorithms/Dijkstra.h
         Algorithms/Prim.h
         Algorithms/Kruskal.h
         Control/Manager.h

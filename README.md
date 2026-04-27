@@ -1,5 +1,5 @@
 ## 🍴 Dining Philosophers - C++ Multithreading & Visual Simulation
-This project is a high-performance C++ implementation of the Dining Philosophers Problem. It serves as a practical study of thread synchronization and resource allocation.
+A high-performance C++ implementation of the Dining Philosophers Problem. It serves as a practical study of thread synchronization and resource allocation.
 ### Overview
 The main focus of this project was conducting an in-depth analysis of thread synchronisation and examining different resource allocation management strategies.
 ### Goals

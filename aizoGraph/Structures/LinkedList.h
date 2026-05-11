@@ -20,9 +20,7 @@ public:
     };
 
     void append(int successorVertex, int weight) {
-        std::cout << "Creating Node with vertex = " << successorVertex << ", weight = " << weight << std::endl;
         Node* node = new Node(Successor(successorVertex, weight));
-        std::cout << "enieodeolse";
         if (head == nullptr) {
             head = node;
         } else {
@@ -55,13 +53,17 @@ public:
     }
 
     void printList() {
-       Node* current = head;
+        Node* current = head;
         while (current != nullptr) {
             std::cout << "(" << current -> data.vertex << ", " << current -> data.weight << ") ";
             current = current -> next;
         }
         std::cout << std::endl;
     }
+
+    Node* getHead() {
+        return head;
+    };
 
 private:
     Node* head = nullptr;

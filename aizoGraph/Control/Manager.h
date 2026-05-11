@@ -2,37 +2,65 @@
 
 #include <random>
 #include <string>
+#include <utility>
 
-#include "C:\\Users\\KatarzynaNowomiejska\\Desktop\\aizo_dwa\\aizoGraph\\Structures\\Graph.h"
+#include "Graph.h"
 #include "FileHandler.h"
-#include "C:\\Users\\KatarzynaNowomiejska\\Desktop\\aizo_dwa\\aizoGraph\\Timer\\Timer.h"
+#include "Timer.h"
+#include "Prim.h"
+#include "Kruskal.h"
+#include "Dijkstra.h"
+#include "BellmanFord.h"
 
 class Manager {
 public:
-    // file mode z plikiem wyjsciowym
+    Manager(int p, int a, std::string  iF, const std::string& oF, int src, int dst)
+        : problem(p), algorithm(a), inputFile(std::move(iF)), outputFile(oF), dataGraph(nullptr), source(src), destination(dst)
+    {
+        file = true;
+        loadFromFile();
+    }
+
+
+    Manager(int p, int a, const std::string& iF, int src, int dst)
+        : problem(p), algorithm(a), inputFile(iF), dataGraph(nullptr), source(src), destination(dst)
+    {
+        file = true;
+        loadFromFile();
+    }
+
     Manager(int p, int a, const std::string& iF, const std::string& oF)
         : problem(p), algorithm(a), inputFile(iF), outputFile(oF), dataGraph(nullptr)
     {
-        isDirected(problem);
+        file = true;
         loadFromFile();
     }
 
-    // file mode bez podanego wyjscia
+
     Manager(int p, int a, const std::string& iF)
         : problem(p), algorithm(a), inputFile(iF), dataGraph(nullptr)
     {
-        isDirected(problem);
+        file = true;
         loadFromFile();
-        dataGraph->printIncidence();
     }
 
-    // tryb benchmarkowy z generowaniem
-    Manager(int p, int a, int s, double d, int c, const std::string& oF)
-        : problem(p), algorithm(a), size(s), density(d), count(c), outputFile(oF), dataGraph(nullptr)
+    // benchmark mode with graph generation
+    Manager(int p, int a, int s, double d, const std::string& oF)
+        : problem(p), algorithm(a), size(s), density(d), outputFile(oF), dataGraph(nullptr)
     {
-        isDirected(problem);
         generateGraph();
-        dataGraph->printIncidence();
+    }
+
+    void runAppropriate() {
+        switch (problem) {
+            case 0:
+                algorithm == 0 ? runPrim() : runKruskal();
+                break;
+            case 1:
+                algorithm == 0 ? runDijkstra() : runBellmanFord();
+                break;
+            default: throw std::runtime_error("Something went wrong with running. ");
+        }
     }
 
     ~Manager() {
@@ -47,8 +75,92 @@ public:
     }
 
 private:
+    void runPrim() {
+        Prim primekI(dataGraph);
+        Timer zegarunio1;
+        primekI.mstIncidenceMatrix();
+        zegarunio1.stop();
+        std::cout  << "Run on Incidence Matrix:" << std::endl;
+        primekI.updateMST();
+
+        Prim primekS(dataGraph);
+        Timer zegarunio2;
+        primekS.mstSuccessorList();
+        zegarunio2.stop();
+        std::cout  << "Run on Successor List:" << std::endl;
+        primekS.updateMST();
+
+        if (file && !outputFile.empty()) {
+            fileHandler.writeFileDone(primekS.getMSTstring(), outputFile);
+        } else {
+            fileHandler.writeFileResults(problem, algorithm, size, density, outputFile, zegarunio1.result(), zegarunio2.result());
+        }
+    }
+
+    void runKruskal() {
+        Kruskal krusekI(dataGraph);
+        Timer zegarunio1;
+        krusekI.mstIncidenceMatrix();
+        zegarunio1.stop();
+        std::cout  << "Run on Incidence Matrix:" << std::endl;
+        krusekI.print();
+
+        Kruskal krusekS(dataGraph);
+        Timer zegarunio2;
+        krusekS.mstSuccessorList();
+        zegarunio2.stop();
+        std::cout  << "Run on Successor List:" << std::endl;
+        krusekS.print();
+
+        if (file && !outputFile.empty()) {
+            fileHandler.writeFileDone(krusekS.getMSTstring(), outputFile);
+        } else {
+            fileHandler.writeFileResults(problem, algorithm, size, density, outputFile, zegarunio1.result(), zegarunio2.result());
+        }
+    }
+
+    void runDijkstra() {
+        Dijkstra dijkstronI(dataGraph, source, destination);
+        Timer zegarunio1;
+        dijkstronI.pathIncidenceMatrix();
+        zegarunio1.stop();
+        dijkstronI.printPath();
+
+        Dijkstra dijkstronS(dataGraph, source,destination);
+        Timer zegarunio2;
+        dijkstronS.pathSuccessorList();
+        zegarunio2.stop();
+        dijkstronS.print();
+
+        if (file && !outputFile.empty()) {
+            fileHandler.writeFileDone(dijkstronS.getPathString(), outputFile);
+        } else {
+            fileHandler.writeFileResults(problem, algorithm, size, density, outputFile, zegarunio1.result(), zegarunio2.result());
+        }
+    }
+
+    void runBellmanFord() {
+        BellmanFord bellmanI(dataGraph, source, destination);
+        Timer zegarunio1;
+        bellmanI.pathIncidenceMatrix(source, destination);
+        zegarunio1.stop();
+
+        BellmanFord bellmanS(dataGraph, source, destination);
+        Timer zegarunio2;
+        bellmanS.pathSuccessorList(source, destination);
+        zegarunio2.stop();
+
+        if (file && !outputFile.empty()) {
+            fileHandler.writeFileDone(bellmanS.getPathString(), outputFile);
+        } else {
+            fileHandler.writeFileResults(problem, algorithm, size, density, outputFile, zegarunio1.result(), zegarunio2.result());
+        }
+    }
+
     void generateGraph() {
         int edges;
+        directed = isDirected(problem);
+
         if (!directed) {
             edges = static_cast<int>(density * (size * (size - 1)) / 2);
         } else {
@@ -119,12 +231,11 @@ private:
         b = temp;
     }
 
-    void isDirected(int decision) {
-        if (decision == 0) {
-            directed = false;
-        } else if (decision == 1) {
-            directed = true;
+    bool isDirected(int decision) {
+        if (decision == 1) {
+            return true;
         }
+        return false;
     }
 
     int randomNumber(int upperRange) {
@@ -140,23 +251,30 @@ private:
     }
 
     void loadFromFile() {
-        fileHandler.readFile(inputFile);
-        dataGraph = fileHandler.getGraph();  // wskazuj bez kopiowania
+        bool dir = false;
+        if (problem == 1) {
+            dir = true;
+        }
+
+        fileHandler.readFile(inputFile, dir);
+        dataGraph = fileHandler.getGraph();
         size = fileHandler.getSize();
     }
 
-    int problem = 0;
-    int algorithm = 0;
-    double density = 0;
-    int count = 0;
-    int size = 0;
-    bool directed;
+    int problem;
+    int algorithm;
+    double density;
+    int count;
+    int size;
+    int source, destination;
+    bool directed = false;
+    bool file = false;
 
     std::string inputFile;
-    std::string outputFile;
+    std::string outputFile = "";
 
     std::mt19937 rand{ std::random_device{}() };
 
-    Graph* dataGraph;      // wskaźnik na aktualny graf
+    Graph* dataGraph;
     FileHandler fileHandler;
 };

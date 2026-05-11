@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-#include "C:\Users\KatarzynaNowomiejska\Desktop\aizo_dwa\aizoGraph\Structures\Graph.h"
+#include "Graph.h"
 
 class FileHandler {
 public:
@@ -13,7 +13,7 @@ public:
         delete graph;
     }
 
-    void readFile(const std::string& filename) {
+    void readFile(const std::string& filename, bool directed) {
         if (filename.empty()) {
             throw std::invalid_argument("No filename given.");
         }
@@ -47,17 +47,34 @@ public:
                 throw std::runtime_error("Invalid edge format.");
             }
 
-
-            graph->addEdge(v1, v2, weight);
+            if (!directed) {
+                graph->addEdgeNotDirected(v1, v2, weight);
+            } else {
+                graph->addEdge(v1, v2, weight);
+            }
         }
     }
 
-    // Zwraca wskaźnik do grafu (może być nullptr jeśli nie wczytano)
+    // benchmark mode: write to file
+    void writeFileResults(int p, int a, int s, double d, std::string oF, int t1, int t2) {
+        std::ofstream file(oF, std::ios::app);
+
+        file << p << " " << a << " " << s << " " << d << " " << t1 << " " << t2 << "\n";
+        file.close();
+    }
+
+    // file mode: write to file
+    void writeFileDone(std::string done, std::string oF) {
+        std::cout << "Saving results to file... ";
+        std::ofstream file(oF);
+        file << done;
+        file.close();
+    }
+
     Graph* getGraph() const {
         return graph;
     }
 
-    // Zwraca liczbę wierzchołków (lub 0 jeśli graf nie istnieje)
     int getSize() const {
         return graph ? graph->getVertexes() : 0;
     }

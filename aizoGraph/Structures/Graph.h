@@ -3,7 +3,6 @@
 
 class Graph {
 public:
-    // destruktor
 
     ~Graph() {
         for (int i = 0; i < vertexes; ++i) {
@@ -13,8 +12,6 @@ public:
         delete[] incidenceMatrix;
         delete[] successorList;
     }
-
-    // konstruktory
 
     Graph(const Graph&) = delete;
     Graph& operator=(const Graph&) = delete;
@@ -31,7 +28,7 @@ public:
         successorList = new LinkedList[vertexes];
     }
 
-    // dodanie krawedzi do grafu (macierz incydencji + lista nastepnikow)
+    // add edge to graph (incidence matrix + successor list)
 
     void addEdge(int startVertex, int endVertex, int weight) {
         incidenceMatrix[startVertex][currentEdgeIndex] = weight;
@@ -48,8 +45,6 @@ public:
         currentEdgeIndex++;
     }
 
-    // gettery
-
     int getEdges() const {
         return edges;
     }
@@ -62,7 +57,10 @@ public:
         return successorList;
     }
 
-    // sprawdzanie czy krawedz miedzy dwoma wiercholkami istnieje
+    int** getIncidenceMatrix() const {
+    return incidenceMatrix;}
+
+    // check if edge between vertices exist
 
     bool edgeExists(int start, int end) {
         return successorList[start].contains(end);
@@ -76,7 +74,6 @@ public:
     }
 
 private:
-    // zmienne
     int edges, vertexes;
     int currentEdgeIndex = 0;
     int** incidenceMatrix = nullptr;

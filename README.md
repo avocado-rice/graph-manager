@@ -14,7 +14,7 @@ Every edge is simultaneously stored in both an Incidence Matrix and an Adjacency
 
 - **Adjacency List:** An array of self-made Linked Lists.
 
-## Modes
+## Usage
 
 The app operates in two modes via the command line - file and benchmark.
 
